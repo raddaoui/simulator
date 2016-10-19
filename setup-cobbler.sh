@@ -69,12 +69,6 @@ sed -i "s/dynamic-bootp        10.0.0.1 10.0.0.50/dynamic-bootp        ${dhcp_ra
 # Create a trusty sources file
 cp -v templates/trusty-sources.list /var/www/html/trusty-sources.list
 
-# Set the default preseed device name.
-#  This is being set because sda is on hosts, vda is kvm, xvda is xen.
-DEVICE_NAME="${DEVICE_NAME:-vda}"
-
-# This is set to instruct the preseed what the default network is expected to be
-DEFAULT_NETWORK="${DEFAULT_NETWORK:-eth0}"
 
 if [ ! -f "/root/.ssh/id_rsa" ];then
   ssh-keygen -t rsa -N '' -f /root/.ssh/id_rsa
@@ -152,9 +146,9 @@ for node_type in $(get_all_types); do
       --kopts="interface=${DEFAULT_NETWORK}" \
       --interface="${DEFAULT_NETWORK}" \
       --mac="52:54:00:bd:81:${node:(-2)}" \
-      --ip-address="172.22.4.${node#*":"}" \
-      --subnet=255.255.252.0 \
-      --gateway=172.22.4.1 \
+      --ip-address="${pxe_subnet%'.'*}.${node#*":"}" \
+      --subnet="$pxe_mask" \
+      --gateway=${pxe_subnet%'.'*}.1 \
       --name-servers=8.8.8.8 8.8.4.4 \
       --static=1
   done

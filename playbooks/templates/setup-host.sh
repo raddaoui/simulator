@@ -44,7 +44,7 @@ if ! grep -q '^net.ipv4.ip_forward' /etc/sysctl.conf; then
 fi
 
 # Enable partitioning of the "${DATA_DISK_DEVICE}"
-PARTITION_HOST=${PARTITION_HOST:-true}
+PARTITION_HOST=${PARTITION_HOST:-false}
 if [[ "${PARTITION_HOST}" = true ]]; then
   # Set the data disk device, if unset the largest unpartitioned device will be used to for host VMs
   DATA_DISK_DEVICE="${DATA_DISK_DEVICE:-$(lsblk -brndo NAME,TYPE,FSTYPE,RO,SIZE | awk '/d[b-z]+ disk +0/{ if ($4>m){m=$4; d=$1}}; END{print d}')}"

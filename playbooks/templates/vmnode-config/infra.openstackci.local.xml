@@ -1,8 +1,8 @@
 <domain type='kvm'>
   <name>__NODE__.openstackci.local</name>
-  <memory unit='GiB'>4</memory>
-  <currentMemory unit='GiB'>4</currentMemory>
-  <vcpu placement='static'>4</vcpu>
+  <memory unit='GiB'>12</memory>
+  <currentMemory unit='GiB'>12</currentMemory>
+  <vcpu placement='static'>10</vcpu>
   <resource>
     <partition>/machine</partition>
   </resource>
@@ -46,7 +46,7 @@
     </controller>
     <interface type='bridge'>
       <mac address="52:54:00:bd:81:__COUNT__"/>
-      <source bridge='br-dhcp'/>
+      <source bridge='{{ vms_networks['br-pxe'] }}'/>
       <target dev='vnet0'/>
       <model type='virtio'/>
       <boot order='2'/>
@@ -55,7 +55,7 @@
     </interface>
     <interface type='bridge'>
       <mac address="52:54:00:fd:7f:__COUNT__"/>
-      <source bridge='vm-br-eth1'/>
+      <source bridge='{{ vms_networks['br-mgmt'] }}'/>
       <target dev='vnet1'/>
       <model type='virtio'/>
       <boot order='3'/>
@@ -64,7 +64,7 @@
     </interface>
     <interface type='bridge'>
       <mac address="52:54:00:f5:44:__COUNT__"/>
-      <source bridge='vm-br-eth2'/>
+      <source bridge='{{ vms_networks['br-flat'] }}'/>
       <target dev='vnet2'/>
       <model type='virtio'/>
       <boot order='4'/>
@@ -73,7 +73,7 @@
     </interface>
     <interface type='bridge'>
       <mac address="52:54:00:1f:96:__COUNT__"/>
-      <source bridge='vm-br-eth3'/>
+      <source bridge='{{ vms_networks['br-vlan'] }}'/>
       <target dev='vnet3'/>
       <model type='virtio'/>
       <boot order='5'/>
@@ -82,7 +82,7 @@
     </interface>
     <interface type='bridge'>
       <mac address="52:54:00:50:03:__COUNT__"/>
-      <source bridge='vm-br-eth4'/>
+      <source bridge='{{ vms_networks['br-vxlan'] }}'/>
       <target dev='vnet4'/>
       <model type='virtio'/>
       <boot order='6'/>
@@ -91,7 +91,7 @@
     </interface>
     <interface type='bridge'>
       <mac address="52:54:00:2d:12:__COUNT__"/>
-      <source bridge='vm-br-eth5'/>
+      <source bridge='{{ vms_networks['br-storage'] }}'/>
       <target dev='vnet5'/>
       <model type='virtio'/>
       <boot order='7'/>

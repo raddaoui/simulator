@@ -72,6 +72,7 @@ for i in x.keys():
 EOL
 }
 
+### must look
 function wait_ssh {
 echo "Waiting for all nodes to become available. This can take around ${1:-10} min"
 for node in $(get_all_hosts); do
@@ -81,7 +82,7 @@ for node in $(get_all_hosts); do
     done
 done
 }
-
+### must
 function rekick_vms {
 # If you pass the short name of the host to the function it will only force rekick just the ONE host.
 # Set the VM disk size in gigabytes

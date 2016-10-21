@@ -4,6 +4,7 @@
   vars_files:
     - vars/main.yml
   tasks:
+  - template: src="templates/hosts.json" dest="/opt/hosts.json" force=yes
   - file: path=/opt/templates/vmnode-config/ state=directory recurse=yes
   - name: copy necessary file 
     copy: src="templates/{{ item }}" dest="/opt/{{ item }}"

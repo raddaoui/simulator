@@ -25,9 +25,10 @@ ssh_agent_reset
 # Create VM Basic Configuration files
 for node_type in $(get_all_types); do
   for node in $(get_host_type ${node_type}); do
+    printf -v hexip "%x" "${node#*":"}"
     cp -v "/opt/templates/vmnode-config/${node_type}.openstackci.local.xml" /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml
     sed -i "s|__NODE__|${node%%":"*}|g" /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml
-    sed -i "s|__COUNT__|${node:(-2)}|g" /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml
+    sed -i "s|__COUNT__|${hexip}|g" /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml
     sed -i "s|__DEVICE_NAME__|${DEVICE_NAME}|g" /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml
   done
 done

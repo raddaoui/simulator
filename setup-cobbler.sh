@@ -139,13 +139,14 @@ for node_type in $(get_all_types); do
       cobbler system remove --name "${node%%':'*}"
     fi
     echo "adding node ${node%%':'*} from the cobbler system"
+    printf -v hexip "%x" "${node#*":"}"
     cobbler system add \
       --name="${node%%':'*}" \
       --profile="ubuntu-server-14.04-unattended-cobbler-${node_type}.seed" \
       --hostname="${node%%":"*}.openstackci.local" \
       --kopts="interface=${DEFAULT_NETWORK}" \
       --interface="${DEFAULT_NETWORK}" \
-      --mac="52:54:00:bd:81:${node:(-2)}" \
+      --mac="52:54:00:bd:81:${hexip}" \
       --ip-address="${pxe_subnet%'.'*}.${node#*":"}" \
       --subnet="$pxe_mask" \
       --gateway=${pxe_subnet%'.'*}.1 \

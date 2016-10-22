@@ -1,0 +1,14 @@
+{
+    "nova_compute": {
+              "compute110": "110",
+              "compute111": "111",
+              "compute112": "112",
+              "compute113": "113",
+              "compute114": "114",
+              "compute115": "115",
+              "compute116": "116",
+              "compute117": "117",
+              "compute118": "118",
+              "compute119": "119"
+    }
+}

@@ -1,0 +1,13 @@
+[simulator]
+simulator01 ansible_ssh_host=172.22.4.34 index=1
+simulator02 ansible_ssh_host=172.22.4.35 index=2
+simulator03 ansible_ssh_host=172.22.4.36 index=3
+simulator04 ansible_ssh_host=172.22.4.37 index=4
+simulator05 ansible_ssh_host=172.22.4.38 index=5
+simulator06 ansible_ssh_host=172.22.4.39 index=6
+simulator07 ansible_ssh_host=172.22.4.40 index=7
+simulator08 ansible_ssh_host=172.22.4.41 index=8
+simulator09 ansible_ssh_host=172.22.4.42 index=9
+simulator10 ansible_ssh_host=172.22.4.43 index=10
+[localhost]
+host ansible_ssh_host=127.0.0.1

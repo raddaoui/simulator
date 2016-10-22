@@ -1,7 +1,0 @@
-{
-    "nova_compute": {
-      {% for i in range(10) %}
-        "compute{{ (index - 1) * vms_per_host + i + start_index }}": "{{ (index - 1) * vms_per_host + i + start_index }}"
-      {% endfor %}
-    }
-}

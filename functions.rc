@@ -44,33 +44,43 @@ fi
 function get_host_type {
 python <<EOL
 import json
-with open('hosts.json') as f:
-    x = json.loads(f.read())
-for k, v in x.get("$1").items():
-    print('%s:%s' % (k, v))
+import os
+for file in os.listdir('hosts_inventory'):
+  with open('hosts_inventory/' + file) as f:
+      x = json.loads(f.read())
+  if x.get("$1"):
+    for k, v in x.get("$1").items():
+        print('%s:%s' % (k, v))
 EOL
 }
 
 function get_all_hosts {
 python <<EOL
 import json
-with open('hosts.json') as f:
-    x = json.loads(f.read())
-for i in x.values():
-    for k, v in i.items():
-      print('%s:%s' % (k, v))
+import os
+for file in os.listdir('hosts_inventory'):
+  with open('hosts_inventory/' + file) as f:
+      x = json.loads(f.read())
+  for i in x.values():
+      for k, v in i.items():
+        print('%s:%s' % (k, v))
 EOL
 }
 
 function get_all_types {
 python <<EOL
 import json
-with open('hosts.json') as f:
-    x = json.loads(f.read())
-for i in x.keys():
-    print(i)
+import os
+all_types =[]
+for file in os.listdir('hosts_inventory'):
+  with open('hosts_inventory/' + file) as f:
+      x = json.loads(f.read())
+  all_types.extend(x.keys())
+for i in set(all_types):
+  print(i)
 EOL
 }
+
 
 function wait_ssh {
 echo "Waiting for all nodes to become available. This can take around ${1:-10} min"

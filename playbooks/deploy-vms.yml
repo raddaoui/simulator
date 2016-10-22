@@ -1,10 +1,14 @@
 ---
 - name: deploy vms accorss hosts
-  hosts: simulator03
+  hosts: simulator07
   vars_files:
     - vars/main.yml
   tasks:
+  - debug: var=playbook_dir
   - template: src="templates/hosts.json" dest="/opt/hosts.json" force=yes
+    template: src="templates/hosts.json" dest="{{ playbook_dir }}/../hosts_inventory/{{ inventory_hostname }}" force=yes
+    delegate_to: "localhost"
+  - fetch: src=/opt/hosts.json dest="/opt/simulator/hosts_inventory/{{ inventory_hostname }}.json" flat=yes
   - file: path=/opt/templates/vmnode-config/ state=directory recurse=yes
   - name: copy necessary file 
     copy: src="templates/{{ item }}" dest="/opt/{{ item }}"
@@ -26,7 +30,6 @@
     shell: bash setup-host.sh
     args:
       chdir: /opt
-#  - name: copy right vm configurations to hosts
   - name: deploy vms
     shell: bash deploy-vms.sh
     args:

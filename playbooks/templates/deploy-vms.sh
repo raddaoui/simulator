@@ -42,8 +42,8 @@ done
 
 # Kick all of the VMs to run the cloud
 #  !!!THIS TASK WILL DESTROY ALL OF THE ROOT DISKS IF THEY ALREADY EXIST!!!
-#rekick_vms
+rekick_vms
 
 # Wait here for all nodes to be booted and ready with SSH
-#wait_ssh
+wait_ssh
 

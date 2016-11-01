@@ -11,3 +11,7 @@ simulator09 ansible_ssh_host=172.22.4.42 index=9
 simulator10 ansible_ssh_host=172.22.4.43 index=10
 [localhost]
 host ansible_ssh_host=127.0.0.1
+[vms]
+simulator1 ansible_ssh_host=172.22.4.81 index=1
+simulator2 ansible_ssh_host=172.22.4.82 index=2
+simulator3 ansible_ssh_host=172.22.4.83 index=3

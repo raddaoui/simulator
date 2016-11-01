@@ -132,8 +132,8 @@ cobbler get-loaders
 cobbler signature update
 
 # Create cobbler systems
-for node_type in $(get_all_types); do
-  for node in $(get_host_type ${node_type}); do
+for node_type in $(get_all_types_inventory); do
+  for node in $(get_host_type_inventory ${node_type}); do
     if cobbler system list | grep -qw "${node%%':'*}"; then
       echo "removing node ${node%%':'*} from the cobbler system"
       cobbler system remove --name "${node%%':'*}"

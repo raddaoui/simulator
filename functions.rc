@@ -44,6 +44,37 @@ fi
 function get_host_type {
 python <<EOL
 import json
+with open('hosts.json') as f:
+    x = json.loads(f.read())
+for k, v in x.get("$1").items():
+    print('%s:%s' % (k, v))
+EOL
+}
+
+function get_all_hosts {
+python <<EOL
+import json
+with open('hosts.json') as f:
+    x = json.loads(f.read())
+for i in x.values():
+    for k, v in i.items():
+      print('%s:%s' % (k, v))
+EOL
+}
+
+function get_all_types {
+python <<EOL
+import json
+with open('hosts.json') as f:
+    x = json.loads(f.read())
+for i in x.keys():
+    print(i)
+EOL
+}
+
+function get_host_type_inventory {
+python <<EOL
+import json
 import os
 for file in os.listdir('hosts_inventory'):
   with open('hosts_inventory/' + file) as f:
@@ -54,7 +85,7 @@ for file in os.listdir('hosts_inventory'):
 EOL
 }
 
-function get_all_hosts {
+function get_all_hosts_inventory {
 python <<EOL
 import json
 import os
@@ -67,7 +98,7 @@ for file in os.listdir('hosts_inventory'):
 EOL
 }
 
-function get_all_types {
+function get_all_types_inventory {
 python <<EOL
 import json
 import os
@@ -81,6 +112,15 @@ for i in set(all_types):
 EOL
 }
 
+function wait_ping {
+echo "Waiting for all nodes to become available. This can take around ${1:-10} min"
+for node in $(get_all_hosts); do
+    echo "Waiting for node: ${node%%":"*} on ${pxe_subnet%'.'*}.${node#*":"}"
+    until ping -c1 ${pxe_subnet%'.'*}.${node#*':'} &>/dev/null; do
+      sleep 15
+    done
+done
+}
 
 function wait_ssh {
 echo "Waiting for all nodes to become available. This can take around ${1:-10} min"

@@ -45,5 +45,5 @@ done
 rekick_vms
 
 # Wait here for all nodes to be booted and ready with SSH
-wait_ssh
+wait_ping
 

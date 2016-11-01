@@ -1,0 +1,14 @@
+{
+    "nova_compute": {
+              "compute80": "80",
+              "compute81": "81",
+              "compute82": "82",
+              "compute83": "83",
+              "compute84": "84",
+              "compute85": "85",
+              "compute86": "86",
+              "compute87": "87",
+              "compute88": "88",
+              "compute89": "89"
+    }
+}

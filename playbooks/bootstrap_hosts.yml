@@ -1,0 +1,28 @@
+---
+- name: deploy vms accorss hosts
+  hosts: simulator04
+  vars_files:
+    - vars/main.yml
+  tasks:
+  - template: src="templates/hosts.json.j2" dest="/opt/hosts.json" force=yes
+  - file: path={{ playbook_dir }}/../hosts_inventory  state=directory
+#    template: src="templates/hosts.json.j2" dest="{{ playbook_dir }}/../hosts_inventory/{{ inventory_hostname }}" force=yes
+#    delegate_to: "localhost"
+  - fetch: src=/opt/hosts.json dest="{{ playbook_dir }}/../hosts_inventory/{{ inventory_hostname }}.json" flat=yes
+  - file: path=/opt/templates/vmnode-config/ state=directory recurse=yes
+  - name: copy necessary file
+    copy: src="{{ playbook_dir }}/../{{ item }}" dest="/opt/{{ item }}"
+    with_items:
+      - functions.rc
+      - vars.rc
+      - setup-host.sh
+      - deploy-vms.sh
+  - name: copy VMs xml template
+    template: src="templates/vmnode-config/{{ item }}" dest="/opt/templates/vmnode-config/{{ item }}" force=yes
+    with_items:
+      - cinder.openstackci.local.xml
+      - infra.openstackci.local.xml
+      - logging.openstackci.local.xml
+      - network.openstackci.local.xml
+      - nova_compute.openstackci.local.xml
+      - swift.openstackci.local.xml

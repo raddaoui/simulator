@@ -1,0 +1,47 @@
+---
+- name: partition a disk to host the VMs
+  hosts: simulator04
+  vars_files:
+    - vars/main.yml
+  tasks:
+#  - name: find biggest unpartitioned disk in the host
+##    shell: "lsblk -brndo NAME,TYPE,FSTYPE,RO,SIZE | awk '/d[b-z]+ disk +0/{ if ($4>m){m=$4; d=$1}}; END{print d}'"
+#    register: use_disk
+#    when: use_disk is not defined
+#  - debug: var=use_disk
+  - name: make sure parted is installed
+    package:
+      name: parted
+      state: present
+  - name: "Partition disk"
+    shell: |
+      if [ -b /dev/{{ use_disk }} ]
+      then
+        if [ ! -b /dev/{{ use_disk }}1 ] 
+        then
+          parted --script /dev/{{ use_disk }} mklabel gpt
+          parted --align optimal --script /dev/{{ use_disk }} mkpart kvm ext4 0% 100%
+        fi
+      fi
+#    args:
+#      creates: '/dev/{{ use_disk.stdout }}1'
+#      executable: '/bin/bash'
+
+  - name: "make filesystem on the partition"
+    filesystem:
+      dev: '/dev/{{ use_disk }}1'
+      force: yes
+      fstype: ext4
+
+  - name: "Ensure mount directory exists"
+    file:
+      path: '/var/lib/libvirt/images/'
+      state: directory
+
+  - name: "Mount additional disk"
+    mount:
+      name: '/var/lib/libvirt/images/'
+      fstype: 'ext4'
+      passno: '0'
+      src: '/dev/{{ use_disk }}1'
+      state: 'mounted'

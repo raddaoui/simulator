@@ -1,6 +1,6 @@
 ---
 - name: setup libvirt networking for VMs
-  hosts: simulator03
+  hosts: simulator04
   vars_files:
     - vars/main.yml
   tasks:

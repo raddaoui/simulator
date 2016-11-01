@@ -20,6 +20,7 @@ source functions.rc
 # Make the rekick function part of the main general shell
 declare -f rekick_vms | tee /root/.functions.rc
 declare -f ssh_agent_reset | tee -a /root/.functions.rc
+
 if ! grep -q 'source /root/.functions.rc' /root/.bashrc; then
   echo 'source /root/.functions.rc' | tee -a /root/.bashrc
 fi
@@ -41,20 +42,6 @@ pkill lockfile-create || true
 # Set the forward rule
 if ! grep -q '^net.ipv4.ip_forward' /etc/sysctl.conf; then
   sysctl -w net.ipv4.ip_forward=1 | tee -a /etc/sysctl.conf
-fi
-
-# Enable partitioning of the "${DATA_DISK_DEVICE}"
-PARTITION_HOST=${PARTITION_HOST:-true}
-if [[ "${PARTITION_HOST}" = true ]]; then
-  # Set the data disk device, if unset the largest unpartitioned device will be used to for host VMs
-  DATA_DISK_DEVICE="${DATA_DISK_DEVICE:-$(lsblk -brndo NAME,TYPE,FSTYPE,RO,SIZE | awk '/d[b-z]+ disk +0/{ if ($4>m){m=$4; d=$1}}; END{print d}')}"
-  parted --script /dev/${DATA_DISK_DEVICE} mklabel gpt
-  parted --align optimal --script /dev/${DATA_DISK_DEVICE} mkpart kvm ext4 0% 100%
-  mkfs.ext4 /dev/${DATA_DISK_DEVICE}1
-  if ! grep -qw "^/dev/${DATA_DISK_DEVICE}1" /etc/fstab; then
-    echo "/dev/${DATA_DISK_DEVICE}1 /var/lib/libvirt/images/ ext4 defaults 0 0" >> /etc/fstab
-  fi
-  mount -a
 fi
 
 cat > /etc/apt/sources.list <<EOF

@@ -1,13 +1,9 @@
 ---
 - name: deploy vms accorss hosts
-  hosts: simulator04
+  hosts: simulator
   vars_files:
     - vars/main.yml
   tasks:
-  - name: setup host prior to deplying vms
-    shell: bash setup-host.sh
-    args:
-      chdir: /opt
   - name: deploy vms
     shell: bash deploy-vms.sh
     args:

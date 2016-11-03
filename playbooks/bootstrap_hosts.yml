@@ -1,6 +1,6 @@
 ---
 - name: deploy vms accorss hosts
-  hosts: simulator04
+  hosts: simulator
   vars_files:
     - vars/main.yml
   tasks:
@@ -26,3 +26,7 @@
       - network.openstackci.local.xml
       - nova_compute.openstackci.local.xml
       - swift.openstackci.local.xml
+  - name: setup host prior to deplying vms
+    shell: bash setup-host.sh
+    args:
+      chdir: /opt

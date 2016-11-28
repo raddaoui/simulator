@@ -132,7 +132,7 @@ for node in $(get_all_nodes_host); do
                     /var/lib/libvirt/images/$node_name.openstackci.local.img \
                     "${VM_DISK_SIZE}G"
   fi
-  VM_NAME=$(virsh list --all --name | grep "node_name" || echo "")
+  VM_NAME=$(virsh list --all --name | grep "$node_name" || echo "")
   if [[ -z "${VM_NAME}" ]]; then
     virsh define /etc/libvirt/qemu/$node_name.openstackci.local.xml || true
     virsh create /etc/libvirt/qemu/$node_name.openstackci.local.xml || true

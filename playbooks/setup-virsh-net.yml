@@ -7,11 +7,16 @@
   - apt: name=python-lxml state=present update_cache=yes
   - name: remove default network
     virt_net: state=absent name=default
-  - virt_net: state=absent name=item
-    with_items: vms_networks.values()
-  - virt_net: command=define name={{ item }} xml='{{ lookup("template", "templates/libvirt-network.xml.j2") }}'
-    with_items: vms_networks.values()
-  - virt_net: state=active name={{ item }}
-    with_items: vms_networks.values()
-  - virt_net: autostart=yes name={{ item }} 
-    with_items: vms_networks.values()
+  - name: make sure all networks are absent
+    virt_net: state=absent name="{{ item }}"
+    with_items: "{{ vms_networks.values() }}"
+  - name: define networks
+    virt_net: command=define name="{{ item }}" xml='{{ lookup("template", "templates/libvirt-network.xml.j2") }}'
+    with_items: "{{ vms_networks.values() }}"
+    ignore_errors: yes
+  - name: make sure all networks are active
+    virt_net: state=active name="{{ item }}"
+    with_items: "{{ vms_networks.values() }}"
+  - name: autostart all networks
+    virt_net: autostart=yes name="{{ item }}"
+    with_items: "{{ vms_networks.values() }}"

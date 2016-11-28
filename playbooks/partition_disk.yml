@@ -4,11 +4,6 @@
   vars_files:
     - vars/main.yml
   tasks:
-#  - name: find biggest unpartitioned disk in the host
-##    shell: "lsblk -brndo NAME,TYPE,FSTYPE,RO,SIZE | awk '/d[b-z]+ disk +0/{ if ($4>m){m=$4; d=$1}}; END{print d}'"
-#    register: use_disk
-#    when: use_disk is not defined
-#  - debug: var=use_disk
   - name: make sure parted is installed
     package:
       name: parted
@@ -23,10 +18,6 @@
           parted --align optimal --script /dev/{{ use_disk }} mkpart kvm ext4 0% 100%
         fi
       fi
-#    args:
-#      creates: '/dev/{{ use_disk.stdout }}1'
-#      executable: '/bin/bash'
-
   - name: "make filesystem on the partition"
     filesystem:
       dev: '/dev/{{ use_disk }}1'

@@ -132,27 +132,28 @@ cobbler get-loaders
 cobbler signature update
 
 # Create cobbler systems
-for node_type in $(get_all_types_inventory); do
-  for node in $(get_host_type_inventory ${node_type}); do
-    if cobbler system list | grep -qw "${node%%':'*}"; then
-      echo "removing node ${node%%':'*} from the cobbler system"
-      cobbler system remove --name "${node%%':'*}"
-    fi
-    echo "adding node ${node%%':'*} from the cobbler system"
-    printf -v hexip "%x" "${node#*":"}"
-    cobbler system add \
-      --name="${node%%':'*}" \
-      --profile="ubuntu-server-14.04-unattended-cobbler-${node_type}.seed" \
-      --hostname="${node%%":"*}.openstackci.local" \
-      --kopts="interface=${DEFAULT_NETWORK}" \
-      --interface="${DEFAULT_NETWORK}" \
-      --mac="52:54:00:bd:81:${hexip}" \
-      --ip-address="${pxe_subnet%'.'*}.${node#*":"}" \
-      --subnet="$pxe_mask" \
-      --gateway=${pxe_subnet%'.'*}.1 \
-      --name-servers=8.8.8.8 8.8.4.4 \
-      --static=1
-  done
+for node in $(get_all_nodes); do
+  node_ip=${node##*','}
+  node_type=${node%%','*}
+  temp=${node%','*}
+  node_name=${temp#*','}
+  if cobbler system list | grep -qw "$node_name"; then
+    echo "removing node $node_name from the cobbler system"
+    cobbler system remove --name "$node_name"
+  fi
+  echo "adding node $node_name from the cobbler system"
+  cobbler system add \
+    --name="$node_name" \
+    --profile="ubuntu-server-14.04-unattended-cobbler-${node_type}.seed" \
+    --hostname="$node_name.openstackci.local" \
+    --kopts="interface=${DEFAULT_NETWORK}" \
+    --interface="${DEFAULT_NETWORK}" \
+    --mac=`ip_2_mac 52:54: $node_ip` \
+    --ip-address="$node_ip" \
+    --subnet="$pxe_mask" \
+    --gateway=${pxe_subnet%'.'*}.1 \
+    --name-servers=8.8.8.8 8.8.4.4 \
+    --static=1
 done
 
 # Restart XinetD

@@ -45,7 +45,7 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
     </controller>
     <interface type='bridge'>
-      <mac address="52:54:00:bd:81:__COUNT__"/>
+      <mac address="__MAC_PXE__"/>
       <source bridge='{{ vms_networks['br-pxe'] }}'/>
       <target dev='vnet0'/>
       <model type='virtio'/>
@@ -54,7 +54,7 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>
     <interface type='bridge'>
-      <mac address="52:54:00:fd:7f:__COUNT__"/>
+      <mac address="__MAC_MGMT__"/>
       <source bridge='{{ vms_networks['br-mgmt'] }}'/>
       <target dev='vnet1'/>
       <model type='virtio'/>
@@ -63,7 +63,7 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x0a' function='0x0'/>
     </interface>
     <interface type='bridge'>
-      <mac address="52:54:00:f5:44:__COUNT__"/>
+      <mac address="__MAC_FLAT__"/>
       <source bridge='{{ vms_networks['br-flat'] }}'/>
       <target dev='vnet2'/>
       <model type='virtio'/>
@@ -72,7 +72,7 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x0b' function='0x0'/>
     </interface>
     <interface type='bridge'>
-      <mac address="52:54:00:1f:96:__COUNT__"/>
+      <mac address="__MAC_VLAN__"/>
       <source bridge='{{ vms_networks['br-vlan'] }}'/>
       <target dev='vnet3'/>
       <model type='virtio'/>
@@ -81,7 +81,7 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x0c' function='0x0'/>
     </interface>
     <interface type='bridge'>
-      <mac address="52:54:00:50:03:__COUNT__"/>
+      <mac address="__MAC_VXLAN__"/>
       <source bridge='{{ vms_networks['br-vxlan'] }}'/>
       <target dev='vnet4'/>
       <model type='virtio'/>
@@ -90,7 +90,7 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x0d' function='0x0'/>
     </interface>
     <interface type='bridge'>
-      <mac address="52:54:00:2d:12:__COUNT__"/>
+      <mac address="__MAC_STORAGE__"/>
       <source bridge='{{ vms_networks['br-storage'] }}'/>
       <target dev='vnet5'/>
       <model type='virtio'/>

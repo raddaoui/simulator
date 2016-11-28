@@ -7,7 +7,4 @@ vms_networks:
  br-vxlan: br-vxlan
  br-storage: br-storage
 
-vms_per_host: 10
-start_index: 50
-
 use_disk: sdc

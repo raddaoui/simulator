@@ -1,0 +1,14 @@
+{
+    "simulator01": {
+        "nova_compute": {
+            "compute20": { "ansible_pxe_host": "172.22.4.50", "ansible_mgmt_host":"172.22.12.50", "ansible_tunnel_host":"172.22.144.50", "ansible_storage_host":"172.22.140.50" },
+            "compute21": { "ansible_pxe_host": "172.22.4.51", "ansible_mgmt_host":"172.22.12.51", "ansible_tunnel_host":"172.22.144.51", "ansible_storage_host":"172.22.140.51" }
+        }
+    },
+    "simulator02": {
+        "nova_compute": { 
+            "compute22": { "ansible_pxe_host": "172.22.4.52", "ansible_mgmt_host":"172.22.12.52", "ansible_tunnel_host":"172.22.144.52", "ansible_storage_host":"172.22.140.52" },
+            "compute23": { "ansible_pxe_host": "172.22.4.53", "ansible_mgmt_host":"172.22.12.53", "ansible_tunnel_host":"172.22.144.53", "ansible_storage_host":"172.22.140.53" }
+        }
+    }
+}

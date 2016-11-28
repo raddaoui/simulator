@@ -23,14 +23,20 @@ ssh_agent_reset
 
 
 # Create VM Basic Configuration files
-for node_type in $(get_all_types); do
-  for node in $(get_host_type ${node_type}); do
-    printf -v hexip "%x" "${node#*":"}"
-    cp -v "/opt/templates/vmnode-config/${node_type}.openstackci.local.xml" /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml
-    sed -i "s|__NODE__|${node%%":"*}|g" /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml
-    sed -i "s|__COUNT__|${hexip}|g" /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml
-    sed -i "s|__DEVICE_NAME__|${DEVICE_NAME}|g" /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml
-  done
+for node in $(get_all_nodes_host); do
+  node_ip=${node##*','}
+  node_type=${node%%','*}
+  temp=${node%','*}
+  node_name=${temp#*','}
+  cp -v "/opt/templates/vmnode-config/${node_type}.openstackci.local.xml" /etc/libvirt/qemu/$node_name.openstackci.local.xml
+  sed -i "s|__NODE__|$node_name|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml
+  sed -i "s|__MAC_PXE__|`ip_2_mac 52:54: $node_ip`|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml
+  sed -i "s|__MAC_MGMT__|`ip_2_mac 52:55: $node_ip`|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml
+  sed -i "s|__MAC_FLAT__|`ip_2_mac 52:56: $node_ip`|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml
+  sed -i "s|__MAC_VLAN__|`ip_2_mac 52:57: $node_ip`|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml
+  sed -i "s|__MAC_VXLAN__|`ip_2_mac 52:58: $node_ip`|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml
+  sed -i "s|__MAC_STORAGE__|`ip_2_mac 52:59: $node_ip`|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml
+  sed -i "s|__DEVICE_NAME__|${DEVICE_NAME}|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml
 done
 
 ## Populate network configurations based on node type

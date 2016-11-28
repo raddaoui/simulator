@@ -41,94 +41,72 @@ if ! iptables -w -t $1 -C $2;then
 fi
 }
 
-function get_host_type {
+function get_all_nodes {
 python <<EOL
 import json
-with open('hosts.json') as f:
-    x = json.loads(f.read())
-for k, v in x.get("$1").items():
-    print('%s:%s' % (k, v))
+with open('sim_inv.json') as f:
+  data = f.read()
+inv = json.loads(data)
+for host in inv.values():
+  for node_type,nodes in host.items():
+    for node_name,node_info in nodes.items():
+      print node_type + ',' + node_name + ',' + node_info['ansible_pxe_host']
 EOL
 }
 
-function get_all_hosts {
-python <<EOL
-import json
-with open('hosts.json') as f:
-    x = json.loads(f.read())
-for i in x.values():
-    for k, v in i.items():
-      print('%s:%s' % (k, v))
-EOL
-}
-
-function get_all_types {
-python <<EOL
-import json
-with open('hosts.json') as f:
-    x = json.loads(f.read())
-for i in x.keys():
-    print(i)
-EOL
-}
-
-function get_host_type_inventory {
+function get_all_nodes_host {
 python <<EOL
 import json
 import os
-for file in os.listdir('hosts_inventory'):
-  with open('hosts_inventory/' + file) as f:
-      x = json.loads(f.read())
-  if x.get("$1"):
-    for k, v in x.get("$1").items():
-        print('%s:%s' % (k, v))
+with open('sim_inv.json') as f:
+  data = f.read()
+inv = json.loads(data)
+host = inv[os.uname()[1]]
+for node_type,nodes in host.items():
+  for node_name,node_info in nodes.items():
+    print node_type + ',' + node_name + ',' + node_info['ansible_pxe_host']
 EOL
 }
 
-function get_all_hosts_inventory {
+function ip_2_mac {
 python <<EOL
-import json
-import os
-for file in os.listdir('hosts_inventory'):
-  with open('hosts_inventory/' + file) as f:
-      x = json.loads(f.read())
-  for i in x.values():
-      for k, v in i.items():
-        print('%s:%s' % (k, v))
-EOL
-}
-
-function get_all_types_inventory {
-python <<EOL
-import json
-import os
-all_types =[]
-for file in os.listdir('hosts_inventory'):
-  with open('hosts_inventory/' + file) as f:
-      x = json.loads(f.read())
-  all_types.extend(x.keys())
-for i in set(all_types):
-  print(i)
+mac_prefix = "$1"
+ip = "$2"
+octets = ip.split('.')
+first_oct = int(octets[0])
+second_oct = int(octets[1])
+third_oct = int(octets[2])
+fourth_oct = int(octets[3])
+mac = mac_prefix + format(first_oct,'02x') + ':' + format(second_oct,'02x') + ':' + format(third_oct, '02x') + ':' + format(fourth_oct, '02x')
+print mac
 EOL
 }
 
 function wait_ping {
 echo "Waiting for all nodes to become available. This can take around ${1:-10} min"
-for node in $(get_all_hosts); do
-    echo "Waiting for node: ${node%%":"*} on ${pxe_subnet%'.'*}.${node#*":"}"
-    until ping -c1 ${pxe_subnet%'.'*}.${node#*':'} &>/dev/null; do
-      sleep 15
-    done
+for node in $(get_all_nodes_host); do
+  node_ip=${node##*','}
+  node_type=${node%%','*}
+  temp=${node%','*}
+  node_name=${temp#*','}
+  echo "Waiting for node: $node_name on $node_ip"
+  until ping -c1 $node_ip &>/dev/null; do
+    sleep 15
+  done
 done
 }
 
 function wait_ssh {
 echo "Waiting for all nodes to become available. This can take around ${1:-10} min"
-for node in $(get_all_hosts); do
-    echo "Waiting for node: ${node%%":"*} on ${pxe_subnet%'.'*}.${node#*":"}"
-    until ssh -q -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=10 ${pxe_subnet%'.'*}.${node#*':'} exit > /dev/null; do
-      sleep 15
-    done
+for node in $(get_all_nodes_host); do
+  node_ip=${node##*','}
+  node_type=${node%%','*}
+  temp=${node%','*}
+  node_name=${temp#*','}
+  echo "Waiting for node: $node_name on $node_ip"
+  until ssh -q -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=10 $node_ip exit > /dev/null; do
+    sleep 15
+  done
 done
 }
 
@@ -136,9 +114,13 @@ function rekick_vms {
 # If you pass the short name of the host to the function it will only force rekick just the ONE host.
 # Set the VM disk size in gigabytes
 VM_DISK_SIZE="${VM_DISK_SIZE:-252}"
-for node in ${1:-$(get_all_hosts)}; do
-  for node_name in $(virsh list --all --name | grep "${node%%":"*}"); do
-    virsh destroy "${node_name}" || true
+for node in $(get_all_nodes_host); do
+  node_ip=${node##*','}
+  node_type=${node%%','*}
+  temp=${node%','*}
+  node_name=${temp#*','}
+  for vm_name in $(virsh list --all --name | grep "$node_name"); do
+    virsh destroy "${vm_name}" || true
   done
   # Instruct the system to run the image create.
   #  If you have the option ``VM_IMAGE_CREATE=true`` the system will reformat the disk image
@@ -147,13 +129,13 @@ for node in ${1:-$(get_all_hosts)}; do
   if [[ "${VM_IMAGE_CREATE}" = true ]]; then
     qemu-img create -f qcow2 \
                     -o preallocation=metadata,compat=1.1,lazy_refcounts=on \
-                    /var/lib/libvirt/images/${node%%":"*}.openstackci.local.img \
+                    /var/lib/libvirt/images/$node_name.openstackci.local.img \
                     "${VM_DISK_SIZE}G"
   fi
-  VM_NAME=$(virsh list --all --name | grep "${node%%":"*}" || echo "")
+  VM_NAME=$(virsh list --all --name | grep "node_name" || echo "")
   if [[ -z "${VM_NAME}" ]]; then
-    virsh define /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml || true
-    virsh create /etc/libvirt/qemu/${node%%":"*}.openstackci.local.xml || true
+    virsh define /etc/libvirt/qemu/$node_name.openstackci.local.xml || true
+    virsh create /etc/libvirt/qemu/$node_name.openstackci.local.xml || true
   else
     virsh start "${VM_NAME}"
   fi

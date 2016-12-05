@@ -4,6 +4,8 @@
   vars_files:
     - vars/main.yml
   tasks:
+  - file: path=/opt/templates/vmnode-config/ state=directory recurse=yes
+#  - file: path=/opt/templates/network-interfaces/ state=directory recurse=yes
   - name: copy necessary file
     copy: src="{{ playbook_dir }}/../{{ item }}" dest="/opt/{{ item }}"
     with_items:
@@ -12,7 +14,6 @@
       - setup-host.sh
       - deploy-vms.sh
       - sim_inv.json
-  - file: path=/opt/templates/vmnode-config/ state=directory recurse=yes
   - name: copy VMs xml template
     template: src="templates/vmnode-config/{{ item }}" dest="/opt/templates/vmnode-config/{{ item }}" force=yes
     with_items:
@@ -22,6 +23,10 @@
       - network.openstackci.local.xml
       - nova_compute.openstackci.local.xml
       - swift.openstackci.local.xml
+#  - name: copy VMs network conf template
+#    template: src="{{ playbook_dir }}/../templates/network-interfaces/{{ item }}" dest="/opt/templates/network-interfaces/{{ item }}" force=yes
+#    with_items:
+#      - vm.openstackci.local-bonded-bridges.cfg
   - name: setup host prior to deplying vms
     shell: bash setup-host.sh
     args:

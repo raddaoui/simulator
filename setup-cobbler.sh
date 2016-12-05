@@ -133,10 +133,13 @@ cobbler signature update
 
 # Create cobbler systems
 for node in $(get_all_nodes); do
-  node_ip=${node##*','}
-  node_type=${node%%','*}
-  temp=${node%','*}
-  node_name=${temp#*','}
+  node_type=`echo $node | awk -F',' '{print $1}'`
+  node_name=`echo $node | awk -F',' '{print $2}'`
+  node_pxe=`echo $node | awk -F',' '{print $3}'`
+  node_mgmt=`echo $node | awk -F',' '{print $4}'`
+  node_tunnel=`echo $node | awk -F',' '{print $5}'`
+  node_storage=`echo $node | awk -F',' '{print $6}'`
+  node_flat=`echo $node | awk -F',' '{print $7}'`
   if cobbler system list | grep -qw "$node_name"; then
     echo "removing node $node_name from the cobbler system"
     cobbler system remove --name "$node_name"
@@ -148,12 +151,18 @@ for node in $(get_all_nodes); do
     --hostname="$node_name.openstackci.local" \
     --kopts="interface=${DEFAULT_NETWORK}" \
     --interface="${DEFAULT_NETWORK}" \
-    --mac=`ip_2_mac 52:54: $node_ip` \
-    --ip-address="$node_ip" \
+    --mac=`ip_2_mac 52:54: $node_pxe` \
+    --ip-address="$node_pxe" \
     --subnet="$pxe_mask" \
     --gateway=${pxe_subnet%'.'*}.1 \
     --name-servers=8.8.8.8 8.8.4.4 \
     --static=1
+
+  # Populate network configurations based on node type
+  sed "s/__mgmtIP__/$node_mgmt/g" "templates/network-interfaces/vm.openstackci.local-bonded-bridges.cfg" > "/var/www/html/osa-$node_name.openstackci.local-bridges.cfg"
+  sed -i "s/__vxlanIP__/$node_tunnel/g" "/var/www/html/osa-$node_name.openstackci.local-bridges.cfg"
+  sed  -i "s/__storageIP__/$node_storage/g" "/var/www/html/osa-$node_name.openstackci.local-bridges.cfg"
+  sed  -i "s/__flatIP__/$node_flat/g" "/var/www/html/osa-$node_name.openstackci.local-bridges.cfg"
 done
 
 # Restart XinetD

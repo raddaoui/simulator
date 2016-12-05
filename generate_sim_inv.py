@@ -73,6 +73,7 @@ def generate_inv(sim_hosts, manager, vms_per_host, nodes_index):
         inv[host]["nova_compute"]["compute" + str(nodes_index)]["ansible_mgmt_host"] = manager.get('mgmt')
         inv[host]["nova_compute"]["compute" + str(nodes_index)]["ansible_tunnel_host"] = manager.get('tunnel')
         inv[host]["nova_compute"]["compute" + str(nodes_index)]["ansible_storage_host"] = manager.get('storage')
+        inv[host]["nova_compute"]["compute" + str(nodes_index)]["ansible_flat_host"] = manager.get('flat')
         nodes_index = nodes_index + 1
     return inv
     
@@ -96,22 +97,23 @@ def main():
         pxe_cidr = cidr_networks['pxe']
         mgmt_cidr = cidr_networks['mgmt']
         tunnel_cidr = cidr_networks['tunnel']
-        storge_cidr = cidr_networks['storage']
+        storage_cidr = cidr_networks['storage']
+        flat_cidr = cidr_networks['flat']
     except Exception as e:
-        raise SystemExit('one of pxe, mgmt, tunnel or storage network is not'
+        raise SystemExit('one of pxe, mgmt, tunnel, flat or storage network is not'
                          'specified in user config.')
 
     # Load all of the IP addresses that we know are used
     set_used_ips(user_defined_config)
     # exclude broadcast and network ips for each cidr
     base_exclude = []
-    for cidr in [pxe_cidr, mgmt_cidr, tunnel_cidr, storge_cidr]:
+    for cidr in [pxe_cidr, mgmt_cidr, tunnel_cidr, storage_cidr, flat_cidr]:
         base_exclude.append(str(netaddr.IPNetwork(cidr).network))
         base_exclude.append(str(netaddr.IPNetwork(cidr).broadcast))
     USED_IPS.update(base_exclude)
 
     # set the queues
-    manager = ip.IPManager(queues={'pxe': pxe_cidr, 'mgmt': mgmt_cidr, 'tunnel': tunnel_cidr, 'storage': storge_cidr},
+    manager = ip.IPManager(queues={'pxe': pxe_cidr, 'mgmt': mgmt_cidr, 'tunnel': tunnel_cidr, 'storage': storage_cidr, 'flat': flat_cidr},
                              used_ips=USED_IPS)
     # generate inventory
     inv = generate_inv(sim_hosts, manager, vms_per_host, nodes_index)

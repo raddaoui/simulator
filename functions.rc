@@ -119,9 +119,6 @@ for node in $(get_all_nodes_host); do
   node_type=${node%%','*}
   temp=${node%','*}
   node_name=${temp#*','}
-  for vm_name in $(virsh list --all --name | grep "$node_name"); do
-    virsh destroy "${vm_name}" || true
-  done
   # Instruct the system to run the image create.
   #  If you have the option ``VM_IMAGE_CREATE=true`` the system will reformat the disk image
   #  destroying anything that was it image previously.

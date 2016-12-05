@@ -28,6 +28,10 @@ for node in $(get_all_nodes_host); do
   node_type=${node%%','*}
   temp=${node%','*}
   node_name=${temp#*','}
+  for vm_name in $(virsh list --all --name | grep "$node_name"); do
+    virsh destroy "${vm_name}" || true
+    virsh undefine "${vm_name}" || true
+  done
   cp -v "/opt/templates/vmnode-config/${node_type}.openstackci.local.xml" /etc/libvirt/qemu/$node_name.openstackci.local.xml
   sed -i "s|__NODE__|$node_name|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml
   sed -i "s|__MAC_PXE__|`ip_2_mac 52:54: $node_ip`|g" /etc/libvirt/qemu/$node_name.openstackci.local.xml

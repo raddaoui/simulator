@@ -1,3 +1,4 @@
 [simulator]
 simulator01 ansible_ssh_host=172.22.4.41
 simulator02 ansible_ssh_host=172.22.4.42
+simulator03 ansible_ssh_host=172.22.4.43

@@ -120,6 +120,24 @@ def main():
     # save inventory
     with open('sim_inv.json', 'w') as outfile:
       json.dump(inv, outfile)
+    # generate osa inventory
+    with open('compute_vms.yml', 'w') as f:
+      f.write('---\n')
+      f.write('compute_vms:\n')
+      for (k,v) in inv.items():
+        for(kk,vv) in v.items():
+          for (kkk,vvv) in vv.items():
+            f.write('  ' + kkk + ':\n')
+            f.write('    ip: ' + vvv['ansible_mgmt_host'] + '\n')
+      f.close()
+    # generate static inventory
+    with open('compute_vms_static_inv.yml', 'w') as f:
+      f.write('[compute_vms]\n')
+      for (k,v) in inv.items():
+        for(kk,vv) in v.items():
+          for (kkk,vvv) in vv.items():
+            f.write(kkk + '  ansible_ssh_host=' + vvv['ansible_mgmt_host'] + '\n')
+      f.close()
 
 if __name__ == "__main__":
 

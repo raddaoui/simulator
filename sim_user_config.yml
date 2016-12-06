@@ -22,3 +22,5 @@ simulator_hosts:
     ip: 172.22.12.41
   simulator02:
     ip: 172.22.12.42
+  simulator03:
+    ip: 172.22.12.43

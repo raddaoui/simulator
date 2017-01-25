@@ -136,7 +136,7 @@ def main():
       for (k,v) in inv.items():
         for(kk,vv) in v.items():
           for (kkk,vvv) in vv.items():
-            f.write(kkk + '  ansible_ssh_host=' + vvv['ansible_mgmt_host'] + '\n')
+            f.write(kkk + '  ansible_ssh_host=' + vvv['ansible_pxe_host'] + '\n')
       f.close()
 
 if __name__ == "__main__":

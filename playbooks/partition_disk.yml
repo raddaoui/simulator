@@ -1,6 +1,6 @@
 ---
 - name: partition a disk to host the VMs
-  hosts: simulator03
+  hosts: simulator
   vars_files:
     - vars/main.yml
   tasks:

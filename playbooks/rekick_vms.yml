@@ -1,0 +1,11 @@
+---
+- name: rekick vms accorss hosts
+  hosts: simulator
+  vars_files:
+    - vars/main.yml
+  tasks:
+  - name: deploy vms
+    shell: source functions.rc && rekick_vms
+    args:
+      executable: /bin/bash
+      chdir: /opt
